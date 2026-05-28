@@ -46,3 +46,5 @@ python -m http.server 8791 --bind 127.0.0.1
 ```
 
 See [docs/icon-completeness-plan.md](docs/icon-completeness-plan.md).
+
+Editor launch instructions: [docs/open-layout-editors.md](docs/open-layout-editors.md).
