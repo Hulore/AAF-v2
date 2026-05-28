@@ -8,10 +8,10 @@
   "elements": {
     "element_icon": {
       "label": "Element icon",
-      "x": 74,
-      "y": 111,
-      "width": 11.05,
-      "height": 10.25,
+      "x": 25,
+      "y": 27,
+      "width": 8,
+      "height": 7.25,
       "gapX": 2,
       "gapY": 0,
       "direction": "left-to-right",
@@ -21,8 +21,8 @@
     },
     "upgraded_diamond": {
       "label": "Upgraded diamond",
-      "x": 105,
-      "y": 34,
+      "x": 57.75,
+      "y": 96.25,
       "width": 15.3,
       "height": 24.85,
       "rotation": 0,
