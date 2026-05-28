@@ -24,5 +24,10 @@ Both commands print an `AafIconResult` JSON object.
 
 This repository starts with the V2 API shell and validation layer. The first real milestone is to port the proven AAF v1 frame rendering into `src/aaf_v2/renderer.py`, then fill the missing icon elements as explicit layout/assets rules.
 
-See [docs/icon-completeness-plan.md](docs/icon-completeness-plan.md).
+The new V2 asset data lives in `data/` and is indexed by `data/asset-manifest.json`:
 
+- `Dmg Type/`: physical, heal, magic, combo, contextual, contextualspell.
+- `Elemental Type/`: earth, electric, explosion, fire, grass, gravity, holy, ice, music, shadow, water, wind.
+- `Upgraded_diamond/`: upgraded diamond overlay.
+
+See [docs/icon-completeness-plan.md](docs/icon-completeness-plan.md).

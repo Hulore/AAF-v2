@@ -51,3 +51,29 @@ def test_generate_writes_svg(tmp_path: Path) -> None:
     assert result.ok
     assert output.exists()
 
+
+def test_preview_embeds_damage_element_and_upgrade_assets() -> None:
+    request = AafIconRequest.from_dict(
+        {
+            "id": "FireCombo",
+            "versionId": "1.1",
+            "variant": "upgraded",
+            "name": "Fire Combo",
+            "classId": "mage",
+            "abilityType": "magic",
+            "frameType": "damage-mana",
+            "damageType": "physical-magic",
+            "element": "fire",
+            "damage": "1x10",
+            "manaCost": 4,
+            "mainSvgId": "756",
+        }
+    )
+
+    result = preview_active_icon(request)
+
+    assert result.ok
+    assert result.svg is not None
+    assert 'id="damage-type-icon"' in result.svg
+    assert 'id="element-icon"' in result.svg
+    assert 'id="upgraded-diamond"' in result.svg

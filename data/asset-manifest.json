@@ -1,0 +1,38 @@
+{
+  "damageTypes": {
+    "physical": "Dmg Type/physical.svg",
+    "heal": "Dmg Type/heal.svg",
+    "magic": "Dmg Type/magic.svg",
+    "combo": "Dmg Type/combo.svg",
+    "contextual": "Dmg Type/contextual.svg",
+    "contextualspell": "Dmg Type/contextualspell.svg"
+  },
+  "damageTypeAliases": {
+    "physical-magic": "combo",
+    "physical_magic": "combo",
+    "physical+magic": "combo",
+    "physical-or-heal": "contextual",
+    "physical_or_heal": "contextual",
+    "physical/heal": "contextual",
+    "magic-or-heal": "contextualspell",
+    "magic_or_heal": "contextualspell",
+    "magic/heal": "contextualspell"
+  },
+  "elements": {
+    "earth": "Elemental Type/Earth.svg",
+    "electric": "Elemental Type/Electric.svg",
+    "electricity": "Elemental Type/Electric.svg",
+    "explosion": "Elemental Type/Explosion.svg",
+    "fire": "Elemental Type/Fire.svg",
+    "grass": "Elemental Type/Grass.svg",
+    "gravity": "Elemental Type/Gravity.svg",
+    "holy": "Elemental Type/Holy.svg",
+    "ice": "Elemental Type/Ice.svg",
+    "music": "Elemental Type/Music.svg",
+    "shadow": "Elemental Type/Shadow.svg",
+    "water": "Elemental Type/Water.svg",
+    "wind": "Elemental Type/Wind.svg"
+  },
+  "upgradedDiamond": "Upgraded_diamond/2775.svg"
+}
+

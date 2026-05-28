@@ -31,8 +31,9 @@ Use a small but representative set first:
 - Mana icon selection and centering.
 - Top active icon selection and per-icon positioning.
 - Upgraded overlay placement and class-color recolor.
+- Upgraded diamond placement.
 - Class frame recolor, including Jester shader.
-- Element-specific visuals, if V2 decides elements should affect icons.
+- Element-specific visuals.
 - Special number strings: `X`, `?`, `N/A`, `1x10`, formulas.
 
 ## Recommended Rule
@@ -43,4 +44,3 @@ Do not manually edit final generated SVG output. If an icon is wrong, fix one of
 - asset mapping
 - layout preset
 - renderer code
-
