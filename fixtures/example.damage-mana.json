@@ -1,0 +1,24 @@
+{
+  "id": "BloodMagic",
+  "versionId": "1.1",
+  "variant": "upgraded",
+  "name": "Blood Magic",
+  "classId": "butcher",
+  "abilityType": "magic",
+  "frameType": "damage-mana",
+  "damageType": "physical",
+  "element": "none",
+  "damage": 5,
+  "manaCost": 0,
+  "mainSvgId": "975",
+  "topIconType": "magic",
+  "topIconSvgId": "2795",
+  "classColor": "#8a3746",
+  "generatorStatus": "partial",
+  "options": {
+    "width": 128,
+    "height": 160,
+    "transparent": true
+  }
+}
+
