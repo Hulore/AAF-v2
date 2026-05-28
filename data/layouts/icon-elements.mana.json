@@ -6,16 +6,6 @@
   },
   "frameType": "mana",
   "elements": {
-    "damage_type_icon": {
-      "label": "Damage type icon",
-      "x": 26.45,
-      "y": 110.9605,
-      "width": 11.9,
-      "height": 26.45,
-      "rotation": 0,
-      "visible": true,
-      "anchor": "center"
-    },
     "element_icon": {
       "label": "Element icon",
       "x": 74,

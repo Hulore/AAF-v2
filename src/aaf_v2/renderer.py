@@ -9,6 +9,26 @@ from .layout import ElementLayout, load_icon_element_layout
 from .models import AafIconRequest
 
 
+LEGACY_DAMAGE_TYPE_LAYOUTS = {
+    "damage-mana": ElementLayout(
+        id="damage_type_icon",
+        label="Legacy damage type icon",
+        x=26.45,
+        y=110.9605,
+        width=11.9,
+        height=26.45,
+    ),
+    "multi-damage-mana": ElementLayout(
+        id="damage_type_icon",
+        label="Legacy damage type icon",
+        x=26.45,
+        y=110.9605,
+        width=11.9,
+        height=26.45,
+    ),
+}
+
+
 def render_active_icon_svg(request: AafIconRequest) -> tuple[str, list[str]]:
     warnings: list[str] = [
         "Renderer uses a placeholder SVG until AAF v1 frame rendering is ported.",
@@ -41,7 +61,7 @@ def embedded_icon_assets(request: AafIconRequest) -> str:
     layout = load_icon_element_layout(request.frameType)
 
     damage_asset = resolve_damage_type_asset(request.damageType)
-    damage_layout = layout.elements.get("damage_type_icon")
+    damage_layout = layout.elements.get("damage_type_icon") or LEGACY_DAMAGE_TYPE_LAYOUTS.get(request.frameType)
     if damage_asset and damage_layout and damage_layout.visible:
         snippets.append(inline_svg(damage_asset, damage_layout, element_id="damage-type-icon"))
 

@@ -32,13 +32,13 @@ Each `frameType` has its own V2 element layout file and editor:
 - `multi-damage-mana`: `data/layouts/icon-elements.multi-damage-mana.json`, `tools/v2_multi_damage_mana_layout_editor.html`
 - `mana`: `data/layouts/icon-elements.mana.json`, `tools/v2_mana_layout_editor.html`
 
-The old AAF frame layout is rendered as the background/reference. The editable layers are the V2 additions: damage type icon, elemental icon row, and upgraded diamond.
+The old AAF frame layout is rendered as the background/reference. The editable layers are the V2 additions: elemental icon row and upgraded diamond. Damage type icons use the legacy frame-rule position, because that placement is already correct.
 
 ## Known Icon Areas To Audit
 
 - Frame variants: mana, damage-mana, multi-damage-mana.
 - Main picture box scaling and anchoring.
-- Damage type icon selection and centering.
+- Damage type icon asset selection on the legacy frame-rule position.
 - Mana icon selection and centering.
 - Top active icon selection and per-icon positioning.
 - Upgraded overlay placement and class-color recolor.

@@ -31,7 +31,7 @@ The new V2 asset data lives in `data/` and is indexed by `data/asset-manifest.js
 - `Upgraded_diamond/`: upgraded diamond overlay.
 - `aaf-v1/`: legacy AAF assets copied from the first tool: frame layers, number icons, top active icons, fonts, class colors, and active frame layout JSON files.
 
-Their editable placement lives in per-frame layout files under `data/layouts/`. `element_icon.x/y` is the center of the first elemental icon; additional elemental icons are always placed left-to-right using `width + gapX`, and all elemental icons share one width/height.
+The editable placement for V2-only additions lives in per-frame layout files under `data/layouts/`. `element_icon.x/y` is the center of the first elemental icon; additional elemental icons are always placed left-to-right using `width + gapX`, and all elemental icons share one width/height. Damage type icons use the legacy frame-rule position.
 
 Per-frame editors:
 

@@ -95,3 +95,4 @@ def test_frame_type_selects_dedicated_icon_element_layout() -> None:
     assert load_icon_element_layout("damage-mana").elements["element_icon"].direction == "left-to-right"
     assert load_icon_element_layout("multi-damage-mana").elements["element_icon"].direction == "left-to-right"
     assert load_icon_element_layout("mana").elements["element_icon"].direction == "left-to-right"
+    assert "damage_type_icon" not in load_icon_element_layout("damage-mana").elements

@@ -1,11 +1,11 @@
 const stage = document.querySelector("#stage");
 const layerSelect = document.querySelector("#layerSelect");
-const damageSample = document.querySelector("#damageSample");
 const elementSamples = document.querySelector("#elementSamples");
 const jsonBox = document.querySelector("#jsonBox");
 const undoBtn = document.querySelector("#undoBtn");
 const exportBtn = document.querySelector("#exportBtn");
 const importBtn = document.querySelector("#importBtn");
+const proportionalInput = document.querySelector("#proportionalInput");
 const titleNode = document.querySelector("#title");
 const fields = {
   x: document.querySelector("#xInput"),
@@ -24,7 +24,7 @@ const localUrl = "http://127.0.0.1:8791/tools/" + window.location.pathname.split
 let layout;
 let manifest;
 let frameRules;
-let selectedId = "damage_type_icon";
+let selectedId = "";
 let drag = null;
 let undoStack = [];
 let viewBox = { minX: 0, minY: -20, width: 120, height: 150 };
@@ -111,17 +111,22 @@ function layerTransform(x, y, scaleX, scaleY, rotation) {
 }
 
 function elementEntries() {
-  return Object.entries(layout.elements);
+  return Object.entries(layout.elements || {});
+}
+
+function ensureSelectedElement() {
+  const elements = layout.elements || {};
+  if (!elements[selectedId]) {
+    selectedId = Object.keys(elements)[0] || "";
+  }
 }
 
 function selectedElement() {
-  return layout.elements[selectedId];
+  ensureSelectedElement();
+  return (layout.elements || {})[selectedId];
 }
 
 function selectedAssetFor(elementId) {
-  if (elementId === "damage_type_icon") {
-    return manifest.damageTypes[damageSample.value];
-  }
   return manifest.upgradedDiamond;
 }
 
@@ -150,6 +155,7 @@ function undoLast() {
 
 function syncControls() {
   const item = selectedElement();
+  if (!item) return;
   fields.x.value = item.x;
   fields.y.value = item.y;
   fields.width.value = item.width;
@@ -312,6 +318,7 @@ function renderV2Layer(elementId, item) {
 function render() {
   stage.querySelectorAll(".frame-layer, .layer").forEach(node => node.remove());
   layerSelect.innerHTML = "";
+  ensureSelectedElement();
   for (const layer of frameRules.layers || []) {
     renderFrameLayer(layer);
   }
@@ -327,12 +334,31 @@ function render() {
   jsonBox.value = JSON.stringify(layout, null, 2);
 }
 
-function updateSelected() {
+function roundedQuarter(value) {
+  return Math.round(value * 4) / 4;
+}
+
+function updateSelected(event) {
   const item = selectedElement();
+  if (!item) return;
+  const previousWidth = Number(item.width || 0);
+  const previousHeight = Number(item.height || 0);
+  const nextWidth = Number(fields.width.value || 0);
+  const nextHeight = Number(fields.height.value || 0);
   item.x = Number(fields.x.value || 0);
   item.y = Number(fields.y.value || 0);
-  item.width = Number(fields.width.value || 0);
-  item.height = Number(fields.height.value || 0);
+  if (proportionalInput?.checked && previousWidth > 0 && previousHeight > 0 && event?.target === fields.width) {
+    item.width = nextWidth;
+    item.height = roundedQuarter(nextWidth * previousHeight / previousWidth);
+    fields.height.value = item.height;
+  } else if (proportionalInput?.checked && previousWidth > 0 && previousHeight > 0 && event?.target === fields.height) {
+    item.height = nextHeight;
+    item.width = roundedQuarter(nextHeight * previousWidth / previousHeight);
+    fields.width.value = item.width;
+  } else {
+    item.width = nextWidth;
+    item.height = nextHeight;
+  }
   item.gapX = Number(fields.gapX.value || 0);
   item.gapY = Number(fields.gapY.value || 0);
   item.rotation = Number(fields.rotation.value || 0);
@@ -367,19 +393,10 @@ async function init() {
   stage.style.width = `${viewBox.width * stageScale}px`;
   stage.style.height = `${viewBox.height * stageScale}px`;
 
-  for (const key of Object.keys(manifest.damageTypes)) {
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = key;
-    damageSample.appendChild(option);
-  }
-  damageSample.value = "physical";
-
   layerSelect.addEventListener("change", () => {
     selectedId = layerSelect.value;
     render();
   });
-  damageSample.addEventListener("change", render);
   elementSamples.addEventListener("input", render);
   Object.values(fields).forEach(input => input.addEventListener("input", updateSelected));
   undoBtn.addEventListener("click", undoLast);
