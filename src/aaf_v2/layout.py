@@ -10,6 +10,11 @@ from .assets import DATA_DIR
 
 
 DEFAULT_ICON_ELEMENT_LAYOUT = DATA_DIR / "layouts" / "icon-elements.json"
+ICON_ELEMENT_LAYOUTS = {
+    "damage-mana": DATA_DIR / "layouts" / "icon-elements.damage-mana.json",
+    "multi-damage-mana": DATA_DIR / "layouts" / "icon-elements.multi-damage-mana.json",
+    "mana": DATA_DIR / "layouts" / "icon-elements.mana.json",
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,8 +57,9 @@ class IconElementLayout:
     elements: dict[str, ElementLayout]
 
 
-@lru_cache(maxsize=1)
-def load_icon_element_layout(path: Path = DEFAULT_ICON_ELEMENT_LAYOUT) -> IconElementLayout:
+@lru_cache(maxsize=None)
+def load_icon_element_layout(frame_type: str = "damage-mana") -> IconElementLayout:
+    path = ICON_ELEMENT_LAYOUTS.get(frame_type, DEFAULT_ICON_ELEMENT_LAYOUT)
     data = json.loads(path.read_text(encoding="utf-8"))
     canvas = data.get("canvas") or {}
     elements = {

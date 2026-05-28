@@ -38,7 +38,7 @@ def render_active_icon_svg(request: AafIconRequest) -> tuple[str, list[str]]:
 
 def embedded_icon_assets(request: AafIconRequest) -> str:
     snippets: list[str] = []
-    layout = load_icon_element_layout()
+    layout = load_icon_element_layout(request.frameType)
 
     damage_asset = resolve_damage_type_asset(request.damageType)
     damage_layout = layout.elements.get("damage_type_icon")

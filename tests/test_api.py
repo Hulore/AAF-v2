@@ -2,6 +2,7 @@ from pathlib import Path
 
 from aaf_v2 import AafIconRequest, generate_active_icon, preview_active_icon
 from aaf_v2.assets import resolve_aaf_v1_path
+from aaf_v2.layout import load_icon_element_layout
 
 
 def test_preview_returns_svg() -> None:
@@ -88,3 +89,9 @@ def test_legacy_aaf_assets_are_available() -> None:
     assert resolve_aaf_v1_path("rules", "mana").exists()
     assert resolve_aaf_v1_path("assetDirs", "numberIcons").exists()
     assert resolve_aaf_v1_path("assetDirs", "topIcons").exists()
+
+
+def test_frame_type_selects_dedicated_icon_element_layout() -> None:
+    assert load_icon_element_layout("damage-mana").elements["element_icon"].direction == "left-to-right"
+    assert load_icon_element_layout("multi-damage-mana").elements["element_icon"].direction == "left-to-right"
+    assert load_icon_element_layout("mana").elements["element_icon"].direction == "left-to-right"

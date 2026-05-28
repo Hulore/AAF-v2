@@ -33,4 +33,16 @@ The new V2 asset data lives in `data/` and is indexed by `data/asset-manifest.js
 
 Their editable placement lives in `data/layouts/icon-elements.json`. Use `tools/v2_icon_elements_layout_editor.html` to move those slots manually. `element_icon.x/y` is the center of the first elemental icon; additional elemental icons are always placed left-to-right using `width + gapX`, and all elemental icons share one width/height.
 
+Per-frame editors:
+
+- `tools/v2_damage_mana_layout_editor.html`
+- `tools/v2_multi_damage_mana_layout_editor.html`
+- `tools/v2_mana_layout_editor.html`
+
+Open them through a local HTTP server so the editor can load JSON/SVG assets:
+
+```powershell
+python -m http.server 8791 --bind 127.0.0.1
+```
+
 See [docs/icon-completeness-plan.md](docs/icon-completeness-plan.md).

@@ -1,0 +1,42 @@
+{
+  "canvas": {
+    "width": 128,
+    "height": 160
+  },
+  "frameType": "mana",
+  "elements": {
+    "damage_type_icon": {
+      "label": "Damage type icon",
+      "x": 29,
+      "y": 136,
+      "width": 14,
+      "height": 24,
+      "rotation": 0,
+      "visible": true,
+      "anchor": "center"
+    },
+    "element_icon": {
+      "label": "Element icon",
+      "x": 100.5,
+      "y": 130.5,
+      "width": 13,
+      "height": 13,
+      "gapX": 2,
+      "gapY": 0,
+      "direction": "left-to-right",
+      "rotation": 0,
+      "visible": true,
+      "anchor": "center"
+    },
+    "upgraded_diamond": {
+      "label": "Upgraded diamond",
+      "x": 105,
+      "y": 34,
+      "width": 18,
+      "height": 28,
+      "rotation": 0,
+      "visible": true,
+      "anchor": "center"
+    }
+  }
+}
