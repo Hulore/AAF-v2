@@ -60,6 +60,13 @@ h1 {
   pointer-events: none;
 }
 
+.frame-layer > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+
 .frame-layer img {
   display: block;
   pointer-events: none;
@@ -85,6 +92,18 @@ h1 {
   border: 1px dashed rgba(255, 255, 255, 0.55);
   color: rgba(255, 255, 255, 0.7);
   font: 12px Arial, sans-serif;
+}
+
+.notice {
+  position: absolute;
+  inset: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #65d6ff;
+  color: #eeeeee;
+  padding: 24px;
+  text-align: center;
+  line-height: 1.45;
 }
 
 .layer {

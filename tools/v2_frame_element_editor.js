@@ -20,6 +20,7 @@ const fields = {
 
 const config = document.body.dataset;
 const stageScale = 4;
+const localUrl = "http://127.0.0.1:8791/tools/" + window.location.pathname.split(/[\\/]/).pop();
 let layout;
 let manifest;
 let frameRules;
@@ -27,6 +28,7 @@ let selectedId = "damage_type_icon";
 let drag = null;
 let undoStack = [];
 let viewBox = { minX: 0, minY: -20, width: 120, height: 150 };
+const previewUrlCache = new Map();
 
 function assetUrl(relativePath) {
   return encodeURI("../data/" + relativePath);
@@ -35,6 +37,34 @@ function assetUrl(relativePath) {
 function legacyAssetUrl(source) {
   if (!source || source === "$main") return "";
   return encodeURI("../data/aaf-v1/" + source.replace(/^\.\.\/\.\.\//, ""));
+}
+
+function recolorSvgText(text) {
+  let result = text;
+  for (const [from, to] of Object.entries(frameRules.preview_recolor || {})) {
+    const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    result = result.replace(new RegExp(escaped, "gi"), to);
+  }
+  if (frameRules.preview_recolor?.["#111111"]) {
+    result = result.replace(/rgb\(\s*17\s*,\s*17\s*,\s*17\s*\)/gi, frameRules.preview_recolor["#111111"]);
+  }
+  return result;
+}
+
+async function previewLegacyAsset(source) {
+  if (previewUrlCache.has(source)) return previewUrlCache.get(source);
+  const url = legacyAssetUrl(source);
+  if (!url) return "";
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return url;
+    const text = recolorSvgText(await response.text());
+    const previewUrl = URL.createObjectURL(new Blob([text], { type: "image/svg+xml" }));
+    previewUrlCache.set(source, previewUrl);
+    return previewUrl;
+  } catch (_error) {
+    return url;
+  }
 }
 
 function normalizedKey(value) {
@@ -52,6 +82,14 @@ function toStageY(value) {
 function parseViewBox(raw) {
   const parts = String(raw || "0 -20 120 150").split(/\s+/).map(Number);
   return { minX: parts[0] || 0, minY: parts[1] || 0, width: parts[2] || 120, height: parts[3] || 150 };
+}
+
+function layerTransform(x, y, scaleX, scaleY, rotation) {
+  return [
+    `translate(${toStageX(x)}px, ${toStageY(y)}px)`,
+    `rotate(${rotation}deg)`,
+    `scale(${scaleX}, ${scaleY})`
+  ].join(" ");
 }
 
 function elementEntries() {
@@ -137,17 +175,18 @@ function renderFrameLayer(layer) {
   const rotation = Number(layer.rotation || 0);
   const anchorX = Number(layer.anchorX || 0);
   const anchorY = Number(layer.anchorY || 0);
+  node.style.transform = layerTransform(x, y, scaleX, scaleY, rotation);
 
   if (layer.type === "text") {
     const width = Number(layer.boxWidth || 16);
     const height = Number(layer.boxHeight || 12);
-    node.style.left = `${toStageX(x - anchorX) }px`;
-    node.style.top = `${toStageY(y - anchorY)}px`;
-    node.style.width = `${width * stageScale}px`;
-    node.style.height = `${height * stageScale}px`;
-    node.style.transform = `rotate(${rotation}deg) scale(${scaleX}, ${scaleY})`;
-    node.textContent = layer.text || "";
-    node.classList.add("frame-text-layer");
+    const textNode = document.createElement("div");
+    textNode.className = "frame-text-layer";
+    textNode.style.width = `${width * stageScale}px`;
+    textNode.style.height = `${height * stageScale}px`;
+    textNode.style.transform = `translate(${-anchorX * stageScale}px, ${-anchorY * stageScale}px)`;
+    textNode.textContent = layer.text || "";
+    node.appendChild(textNode);
     stage.appendChild(node);
     return;
   }
@@ -155,23 +194,23 @@ function renderFrameLayer(layer) {
   if (layer.source === "$main" || layer.fitMode) {
     const width = Number(layer.boxWidth || 64);
     const height = Number(layer.boxHeight || 59);
-    node.style.left = `${toStageX(x - anchorX)}px`;
-    node.style.top = `${toStageY(y - anchorY)}px`;
-    node.style.width = `${width * stageScale}px`;
-    node.style.height = `${height * stageScale}px`;
-    node.style.transform = `rotate(${rotation}deg)`;
-    node.classList.add("main-box-guide");
-    node.textContent = "main";
+    const guide = document.createElement("div");
+    guide.className = "main-box-guide";
+    guide.style.width = `${width * stageScale}px`;
+    guide.style.height = `${height * stageScale}px`;
+    guide.style.transform = `translate(${-anchorX * stageScale}px, ${-anchorY * stageScale}px)`;
+    guide.textContent = "main";
+    node.appendChild(guide);
     stage.appendChild(node);
     return;
   }
 
   const img = document.createElement("img");
   img.src = legacyAssetUrl(layer.source);
-  img.style.transform = `scale(${scaleX}, ${scaleY})`;
-  node.style.left = `${toStageX(x - anchorX * scaleX)}px`;
-  node.style.top = `${toStageY(y - anchorY * scaleY)}px`;
-  node.style.transform = `rotate(${rotation}deg)`;
+  previewLegacyAsset(layer.source).then(url => {
+    if (url) img.src = url;
+  });
+  img.style.transform = `translate(${-anchorX * stageScale}px, ${-anchorY * stageScale}px) scale(${stageScale})`;
   node.appendChild(img);
   stage.appendChild(node);
 }
@@ -283,6 +322,15 @@ function updateSelected() {
 
 async function init() {
   titleNode.textContent = config.title || "AAF v2 Frame Element Editor";
+  if (window.location.protocol === "file:") {
+    stage.textContent = "";
+    const notice = document.createElement("div");
+    notice.className = "notice";
+    notice.textContent = "Open this editor through the local server: " + localUrl;
+    stage.appendChild(notice);
+    jsonBox.value = "The editor loads JSON/SVG files with fetch(), so it needs http://127.0.0.1:8791/ instead of file://.";
+    return;
+  }
   const [layoutResponse, manifestResponse, frameResponse] = await Promise.all([
     fetch(config.layout),
     fetch("../data/asset-manifest.json"),
