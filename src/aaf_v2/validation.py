@@ -32,16 +32,17 @@ def validate_request(request: AafIconRequest) -> tuple[list[str], list[str]]:
     if request.frameType not in VALID_FRAME_TYPES:
         errors.append(f"Unsupported frameType: {request.frameType}")
     damage_type = normalize_key(request.damageType)
-    element = normalize_key(request.element)
+    elements = [normalize_key(element) for element in request.elements] or [normalize_key(request.element)]
 
     if damage_type not in VALID_DAMAGE_TYPES:
         warnings.append(f"Unknown damageType: {request.damageType}")
     elif damage_type != "none" and resolve_damage_type_asset(request.damageType) is None:
         warnings.append(f"No asset for damageType: {request.damageType}")
-    if element not in VALID_ELEMENTS:
-        warnings.append(f"Unknown element: {request.element}")
-    elif element != "none" and resolve_element_asset(request.element) is None:
-        warnings.append(f"No asset for element: {request.element}")
+    for element in elements:
+        if element not in VALID_ELEMENTS:
+            warnings.append(f"Unknown element: {element}")
+        elif element != "none" and resolve_element_asset(element) is None:
+            warnings.append(f"No asset for element: {element}")
     if request.generatorStatus not in VALID_GENERATOR_STATUSES:
         errors.append(f"Unsupported generatorStatus: {request.generatorStatus}")
 

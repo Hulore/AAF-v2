@@ -63,7 +63,7 @@ def test_preview_embeds_damage_element_and_upgrade_assets() -> None:
             "abilityType": "magic",
             "frameType": "damage-mana",
             "damageType": "physical-magic",
-            "element": "fire",
+            "elements": ["fire", "ice"],
             "damage": "1x10",
             "manaCost": 4,
             "mainSvgId": "756",
@@ -75,5 +75,7 @@ def test_preview_embeds_damage_element_and_upgrade_assets() -> None:
     assert result.ok
     assert result.svg is not None
     assert 'id="damage-type-icon"' in result.svg
-    assert 'id="element-icon"' in result.svg
+    assert 'id="element-icons"' in result.svg
+    assert 'id="element-icon-1-fire"' in result.svg
+    assert 'id="element-icon-2-ice"' in result.svg
     assert 'id="upgraded-diamond"' in result.svg

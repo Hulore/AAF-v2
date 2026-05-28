@@ -20,6 +20,9 @@
       "y": 130.5,
       "width": 13,
       "height": 13,
+      "gapX": 2,
+      "gapY": 0,
+      "direction": "left-to-right",
       "rotation": 0,
       "visible": true,
       "anchor": "center"
@@ -36,4 +39,3 @@
     }
   }
 }
-

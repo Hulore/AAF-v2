@@ -36,6 +36,7 @@ class AafIconRequest:
     frameType: str
     damageType: str
     element: str
+    elements: list[str] = field(default_factory=list)
     damage: int | str | None = None
     manaCost: int | str | None = None
     mainSvgId: str | None = None
@@ -58,7 +59,8 @@ class AafIconRequest:
             abilityType=str(data.get("abilityType") or ""),
             frameType=str(data.get("frameType") or ""),
             damageType=str(data.get("damageType") or ""),
-            element=str(data.get("element") or "none"),
+            element=first_element(data),
+            elements=parse_elements(data),
             damage=data.get("damage"),
             manaCost=data.get("manaCost"),
             mainSvgId=nullable_str(data.get("mainSvgId")),
@@ -82,6 +84,7 @@ class AafIconRequest:
             "frameType": self.frameType,
             "damageType": self.damageType,
             "element": self.element,
+            "elements": self.elements,
             "damage": self.damage,
             "manaCost": self.manaCost,
             "mainSvgId": self.mainSvgId,
@@ -126,3 +129,19 @@ def nullable_str(value: Any) -> str | None:
     text = str(value)
     return text if text else None
 
+
+def parse_elements(data: dict[str, Any]) -> list[str]:
+    raw = data.get("elements", data.get("element"))
+    if raw is None:
+        return []
+    if isinstance(raw, list):
+        values = raw
+    else:
+        values = str(raw).replace("/", ",").split(",")
+    elements = [str(value).strip() for value in values if str(value).strip()]
+    return [] if elements == ["none"] else elements
+
+
+def first_element(data: dict[str, Any]) -> str:
+    elements = parse_elements(data)
+    return elements[0] if elements else "none"

@@ -4,7 +4,7 @@ from html import escape
 import re
 from pathlib import Path
 
-from .assets import resolve_damage_type_asset, resolve_element_asset, resolve_upgraded_diamond_asset
+from .assets import normalize_key, resolve_damage_type_asset, resolve_element_asset, resolve_upgraded_diamond_asset
 from .layout import ElementLayout, load_icon_element_layout
 from .models import AafIconRequest
 
@@ -45,10 +45,10 @@ def embedded_icon_assets(request: AafIconRequest) -> str:
     if damage_asset and damage_layout and damage_layout.visible:
         snippets.append(inline_svg(damage_asset, damage_layout, element_id="damage-type-icon"))
 
-    element_asset = resolve_element_asset(request.element)
     element_layout = layout.elements.get("element_icon")
-    if element_asset and element_layout and element_layout.visible:
-        snippets.append(inline_svg(element_asset, element_layout, element_id="element-icon"))
+    element_assets = resolved_element_assets(request)
+    if element_assets and element_layout and element_layout.visible:
+        snippets.append(inline_element_row(element_assets, element_layout))
 
     upgraded_layout = layout.elements.get("upgraded_diamond")
     if request.variant == "upgraded" and upgraded_layout and upgraded_layout.visible:
@@ -63,7 +63,45 @@ def embedded_icon_assets(request: AafIconRequest) -> str:
     return "\n  ".join(snippets)
 
 
-def inline_svg(path: Path, layout: ElementLayout, *, element_id: str) -> str:
+def resolved_element_assets(request: AafIconRequest) -> list[tuple[str, Path]]:
+    values = request.elements or ([request.element] if request.element else [])
+    assets: list[tuple[str, Path]] = []
+    for value in values:
+        key = normalize_key(value)
+        if key in {"", "none"}:
+            continue
+        asset = resolve_element_asset(key)
+        if asset:
+            assets.append((key, asset))
+    return assets
+
+
+def inline_element_row(element_assets: list[tuple[str, Path]], layout: ElementLayout) -> str:
+    children: list[str] = []
+    for index, (key, path) in enumerate(element_assets):
+        # Element icons are intentionally laid out left-to-right from the first icon anchor.
+        x = layout.x + index * (layout.width + layout.gap_x)
+        y = layout.y + index * layout.gap_y
+        children.append(
+            inline_svg(
+                path,
+                layout,
+                element_id=f"element-icon-{index + 1}-{key}",
+                x=x,
+                y=y,
+            )
+        )
+    return f'<g id="element-icons">{"".join(children)}</g>'
+
+
+def inline_svg(
+    path: Path,
+    layout: ElementLayout,
+    *,
+    element_id: str,
+    x: float | None = None,
+    y: float | None = None,
+) -> str:
     text = path.read_text(encoding="utf-8", errors="ignore")
     source_width = parse_svg_dimension(text, "width") or layout.width
     source_height = parse_svg_dimension(text, "height") or layout.height
@@ -71,8 +109,10 @@ def inline_svg(path: Path, layout: ElementLayout, *, element_id: str) -> str:
     inner = re.sub(r"</svg>\s*$", "", inner, flags=re.IGNORECASE | re.DOTALL).strip()
     offset_x = -layout.width / 2 if layout.anchor == "center" else 0
     offset_y = -layout.height / 2 if layout.anchor == "center" else 0
+    target_x = layout.x if x is None else x
+    target_y = layout.y if y is None else y
     return (
-        f'<g id="{escape(element_id)}" transform="translate({layout.x:g} {layout.y:g}) rotate({layout.rotation:g})">'
+        f'<g id="{escape(element_id)}" transform="translate({target_x:g} {target_y:g}) rotate({layout.rotation:g})">'
         f'<svg x="{offset_x:g}" y="{offset_y:g}" width="{layout.width:g}" height="{layout.height:g}" '
         f'viewBox="0 0 {source_width:g} {source_height:g}" overflow="visible">{inner}</svg></g>'
     )

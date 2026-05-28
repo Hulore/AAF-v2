@@ -23,6 +23,9 @@ class ElementLayout:
     rotation: float = 0
     visible: bool = True
     anchor: str = "center"
+    gap_x: float = 0
+    gap_y: float = 0
+    direction: str = "left-to-right"
 
     @classmethod
     def from_dict(cls, element_id: str, data: dict[str, Any]) -> "ElementLayout":
@@ -36,6 +39,9 @@ class ElementLayout:
             rotation=float(data.get("rotation") or 0),
             visible=bool(data.get("visible", True)),
             anchor=str(data.get("anchor") or "center"),
+            gap_x=float(data.get("gapX") or data.get("gap_x") or 0),
+            gap_y=float(data.get("gapY") or data.get("gap_y") or 0),
+            direction=str(data.get("direction") or "left-to-right"),
         )
 
 
@@ -59,4 +65,3 @@ def load_icon_element_layout(path: Path = DEFAULT_ICON_ELEMENT_LAYOUT) -> IconEl
         canvas_height=float(canvas.get("height") or 160),
         elements=elements,
     )
-

@@ -30,6 +30,6 @@ The new V2 asset data lives in `data/` and is indexed by `data/asset-manifest.js
 - `Elemental Type/`: earth, electric, explosion, fire, grass, gravity, holy, ice, music, shadow, water, wind.
 - `Upgraded_diamond/`: upgraded diamond overlay.
 
-Their editable placement lives in `data/layouts/icon-elements.json`. Use `tools/v2_icon_elements_layout_editor.html` to move those slots manually.
+Their editable placement lives in `data/layouts/icon-elements.json`. Use `tools/v2_icon_elements_layout_editor.html` to move those slots manually. `element_icon.x/y` is the center of the first elemental icon; additional elemental icons are always placed left-to-right using `width + gapX`, and all elemental icons share one width/height.
 
 See [docs/icon-completeness-plan.md](docs/icon-completeness-plan.md).
