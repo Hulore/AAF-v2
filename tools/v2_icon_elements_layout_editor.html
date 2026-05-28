@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAF v2 Icon Element Layout Editor</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, sans-serif;
+      background: #202124;
+      color: #eeeeee;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(560px, 1fr) 380px;
+    }
+
+    main {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    aside {
+      border-left: 1px solid #3d3f45;
+      padding: 16px;
+      background: #292b31;
+      overflow: auto;
+      max-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    #stage {
+      position: relative;
+      width: 512px;
+      height: 640px;
+      background:
+        linear-gradient(45deg, #303238 25%, transparent 25%),
+        linear-gradient(-45deg, #303238 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #303238 75%),
+        linear-gradient(-45deg, transparent 75%, #303238 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      border: 1px solid #555861;
+      overflow: hidden;
+    }
+
+    #frameGuide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+      cursor: move;
+      user-select: none;
+    }
+
+    .layer img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .layer.selected {
+      outline: 1px dashed #65d6ff;
+      outline-offset: 2px;
+    }
+
+    .anchor {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      margin: -4px 0 0 -4px;
+      border: 1px solid #65d6ff;
+      background: #202124;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      box-sizing: border-box;
+      width: 100%;
+      border: 1px solid #555861;
+      border-radius: 4px;
+      background: #1f2025;
+      color: #eeeeee;
+      padding: 8px;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      background: #3a3d46;
+    }
+
+    button:hover {
+      background: #464a55;
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="stage">
+      <svg id="frameGuide" viewBox="0 0 128 160">
+        <rect width="128" height="160" fill="none"/>
+        <path d="M20 44 L42 22 H86 L108 44 V122 H20 Z" fill="#8a3746" stroke="#111111" stroke-width="8" stroke-linejoin="round"/>
+        <rect x="32" y="54" width="64" height="52" rx="2" fill="#ffffff" stroke="#111111" stroke-width="5"/>
+        <rect x="20" y="122" width="88" height="26" fill="#8a3746" stroke="#111111" stroke-width="6"/>
+        <text x="42" y="140" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#111111">5</text>
+        <text x="84" y="140" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#ffffff">2</text>
+      </svg>
+    </div>
+  </main>
+  <aside>
+    <label>
+      Layer
+      <select id="layerSelect"></select>
+    </label>
+    <label>
+      Damage sample
+      <select id="damageSample"></select>
+    </label>
+    <label>
+      Element sample
+      <select id="elementSample"></select>
+    </label>
+    <div class="row">
+      <label>X center<input id="xInput" type="number" step="0.25"></label>
+      <label>Y center<input id="yInput" type="number" step="0.25"></label>
+    </div>
+    <div class="row">
+      <label>Width<input id="widthInput" type="number" step="0.25"></label>
+      <label>Height<input id="heightInput" type="number" step="0.25"></label>
+    </div>
+    <label>
+      Rotation
+      <input id="rotationInput" type="number" step="1">
+    </label>
+    <label>
+      <span><input id="visibleInput" type="checkbox" style="width:auto"> Visible</span>
+    </label>
+    <button id="undoBtn" type="button">Undo</button>
+    <button id="exportBtn" type="button">Export JSON</button>
+    <button id="importBtn" type="button">Import JSON</button>
+    <textarea id="jsonBox" spellcheck="false"></textarea>
+  </aside>
+
+  <script>
+    const stage = document.querySelector("#stage");
+    const layerSelect = document.querySelector("#layerSelect");
+    const damageSample = document.querySelector("#damageSample");
+    const elementSample = document.querySelector("#elementSample");
+    const jsonBox = document.querySelector("#jsonBox");
+    const undoBtn = document.querySelector("#undoBtn");
+    const exportBtn = document.querySelector("#exportBtn");
+    const importBtn = document.querySelector("#importBtn");
+    const fields = {
+      x: document.querySelector("#xInput"),
+      y: document.querySelector("#yInput"),
+      width: document.querySelector("#widthInput"),
+      height: document.querySelector("#heightInput"),
+      rotation: document.querySelector("#rotationInput"),
+      visible: document.querySelector("#visibleInput")
+    };
+
+    const stageScale = 4;
+    let layout;
+    let manifest;
+    let selectedId = "damage_type_icon";
+    let drag = null;
+    let undoStack = [];
+
+    function assetUrl(relativePath) {
+      return encodeURI("../data/" + relativePath);
+    }
+
+    function elementEntries() {
+      return Object.entries(layout.elements);
+    }
+
+    function selectedElement() {
+      return layout.elements[selectedId];
+    }
+
+    function selectedAssetFor(elementId) {
+      if (elementId === "damage_type_icon") {
+        return manifest.damageTypes[damageSample.value];
+      }
+      if (elementId === "element_icon") {
+        return manifest.elements[elementSample.value];
+      }
+      return manifest.upgradedDiamond;
+    }
+
+    function pushUndo() {
+      undoStack.push(JSON.stringify(layout));
+      if (undoStack.length > 50) undoStack.shift();
+      undoBtn.disabled = false;
+    }
+
+    function undoLast() {
+      const previous = undoStack.pop();
+      if (!previous) return;
+      layout = JSON.parse(previous);
+      undoBtn.disabled = undoStack.length === 0;
+      render();
+    }
+
+    function syncControls() {
+      const item = selectedElement();
+      fields.x.value = item.x;
+      fields.y.value = item.y;
+      fields.width.value = item.width;
+      fields.height.value = item.height;
+      fields.rotation.value = item.rotation || 0;
+      fields.visible.checked = item.visible !== false;
+    }
+
+    function renderLayer(elementId, item) {
+      const node = document.createElement("div");
+      node.className = "layer" + (elementId === selectedId ? " selected" : "");
+      node.dataset.id = elementId;
+      node.style.width = `${item.width * stageScale}px`;
+      node.style.height = `${item.height * stageScale}px`;
+      node.style.transform = [
+        `translate(${(item.x - item.width / 2) * stageScale}px, ${(item.y - item.height / 2) * stageScale}px)`,
+        `rotate(${item.rotation || 0}deg)`
+      ].join(" ");
+      node.style.display = item.visible === false ? "none" : "block";
+
+      const img = document.createElement("img");
+      img.src = assetUrl(selectedAssetFor(elementId));
+      node.appendChild(img);
+
+      const anchor = document.createElement("span");
+      anchor.className = "anchor";
+      node.appendChild(anchor);
+
+      node.addEventListener("pointerdown", event => {
+        if (elementId !== selectedId) return;
+        event.preventDefault();
+        pushUndo();
+        drag = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          layerId: elementId,
+          x: item.x,
+          y: item.y
+        };
+        node.setPointerCapture(event.pointerId);
+      });
+
+      node.addEventListener("pointermove", event => {
+        if (!drag || drag.pointerId !== event.pointerId || drag.layerId !== elementId) return;
+        const target = layout.elements[elementId];
+        target.x = Math.round((drag.x + (event.clientX - drag.startX) / stageScale) * 4) / 4;
+        target.y = Math.round((drag.y + (event.clientY - drag.startY) / stageScale) * 4) / 4;
+        syncControls();
+        render();
+      });
+
+      node.addEventListener("pointerup", () => {
+        drag = null;
+      });
+
+      stage.appendChild(node);
+    }
+
+    function render() {
+      stage.querySelectorAll(".layer").forEach(node => node.remove());
+      layerSelect.innerHTML = "";
+      for (const [elementId, item] of elementEntries()) {
+        const option = document.createElement("option");
+        option.value = elementId;
+        option.textContent = item.label || elementId;
+        option.selected = elementId === selectedId;
+        layerSelect.appendChild(option);
+        renderLayer(elementId, item);
+      }
+      syncControls();
+      jsonBox.value = JSON.stringify(layout, null, 2);
+    }
+
+    function updateSelected() {
+      const item = selectedElement();
+      item.x = Number(fields.x.value || 0);
+      item.y = Number(fields.y.value || 0);
+      item.width = Number(fields.width.value || 0);
+      item.height = Number(fields.height.value || 0);
+      item.rotation = Number(fields.rotation.value || 0);
+      item.visible = fields.visible.checked;
+      item.anchor = "center";
+      render();
+    }
+
+    async function init() {
+      const [layoutResponse, manifestResponse] = await Promise.all([
+        fetch("../data/layouts/icon-elements.json"),
+        fetch("../data/asset-manifest.json")
+      ]);
+      layout = await layoutResponse.json();
+      manifest = await manifestResponse.json();
+
+      for (const key of Object.keys(manifest.damageTypes)) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = key;
+        damageSample.appendChild(option);
+      }
+      damageSample.value = "physical";
+
+      for (const key of Object.keys(manifest.elements)) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = key;
+        elementSample.appendChild(option);
+      }
+      elementSample.value = "fire";
+
+      layerSelect.addEventListener("change", () => {
+        selectedId = layerSelect.value;
+        render();
+      });
+      damageSample.addEventListener("change", render);
+      elementSample.addEventListener("change", render);
+      Object.values(fields).forEach(input => input.addEventListener("input", updateSelected));
+      undoBtn.addEventListener("click", undoLast);
+      exportBtn.addEventListener("click", () => {
+        jsonBox.value = JSON.stringify(layout, null, 2);
+        jsonBox.select();
+      });
+      importBtn.addEventListener("click", () => {
+        pushUndo();
+        layout = JSON.parse(jsonBox.value);
+        render();
+      });
+
+      undoBtn.disabled = true;
+      render();
+    }
+
+    init().catch(error => {
+      jsonBox.value = String(error.stack || error);
+    });
+  </script>
+</body>
+</html>

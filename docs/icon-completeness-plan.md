@@ -6,9 +6,10 @@ The first practical V2 milestone should be icon completeness, because the websit
 
 1. Freeze the V2 request/result API.
 2. Port AAF v1 frame rendering into `src/aaf_v2/renderer.py`.
-3. Create a fixture set with one ability per visual case.
-4. Compare generated icons against the current best AAF v1 output and game references.
-5. Add missing elements as data-driven layout rules, not one-off SVG edits.
+3. Manually place the new icon elements in `data/layouts/icon-elements.json`.
+4. Create a fixture set with one ability per visual case.
+5. Compare generated icons against the current best AAF v1 output and game references.
+6. Add missing elements as data-driven layout rules, not one-off SVG edits.
 
 ## Fixture Set
 
