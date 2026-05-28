@@ -84,6 +84,24 @@ function parseViewBox(raw) {
   return { minX: parts[0] || 0, minY: parts[1] || 0, width: parts[2] || 120, height: parts[3] || 150 };
 }
 
+function estimatedTextWidth(text, fontSize) {
+  return String(text || "").length * fontSize * 0.62;
+}
+
+function fitBoxFont(layer) {
+  const boxWidth = Number(layer.boxWidth || 18);
+  const boxHeight = Number(layer.boxHeight || 13);
+  const minFontSize = Number(layer.minFontSize || 4);
+  let fontSize = Number(layer.fontSize || 12);
+  while (fontSize > minFontSize) {
+    if (estimatedTextWidth(layer.text || "0", fontSize) <= boxWidth && fontSize <= boxHeight) {
+      return fontSize;
+    }
+    fontSize -= 0.25;
+  }
+  return minFontSize;
+}
+
 function layerTransform(x, y, scaleX, scaleY, rotation) {
   return [
     `translate(${toStageX(x)}px, ${toStageY(y)}px)`,
@@ -184,8 +202,14 @@ function renderFrameLayer(layer) {
     textNode.className = "frame-text-layer";
     textNode.style.width = `${width * stageScale}px`;
     textNode.style.height = `${height * stageScale}px`;
+    textNode.style.color = layer.fill || "#000000";
+    textNode.style.fontFamily = `"${layer.fontFamily || "MewgenicsMain"}", Arial, sans-serif`;
     textNode.style.transform = `translate(${-anchorX * stageScale}px, ${-anchorY * stageScale}px)`;
-    textNode.textContent = layer.text || "";
+    const textValue = document.createElement("span");
+    textValue.className = "frame-text-value";
+    textValue.style.fontSize = `${fitBoxFont(layer) * stageScale}px`;
+    textValue.textContent = layer.text || "0";
+    textNode.appendChild(textValue);
     node.appendChild(textNode);
     stage.appendChild(node);
     return;

@@ -5,6 +5,16 @@
   color: #eeeeee;
 }
 
+@font-face {
+  font-family: "MewgenicsMain";
+  src: url("../data/aaf-v1/SVG Important/MainFont/fonts/6_Edmundm_EdmundMcMillen_INTLv4 Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "MewgenicsNumber";
+  src: url("../data/aaf-v1/SVG Important/Number Fonts/fonts/1_TikaFont_TikaFont Adjusted Regular.ttf") format("truetype");
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -79,10 +89,17 @@ h1 {
   box-sizing: border-box;
   border: 1px dashed rgba(180, 180, 180, 0.5);
   color: #000000;
-  font-family: Arial, sans-serif;
-  font-weight: 700;
+  font-family: "MewgenicsMain", Arial, sans-serif;
+  font-weight: 400;
   line-height: 1;
+  overflow: hidden;
   text-align: center;
+  white-space: nowrap;
+}
+
+.frame-text-value {
+  display: block;
+  line-height: 1;
 }
 
 .main-box-guide {
