@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from aaf_v2 import AafIconRequest, generate_active_icon, preview_active_icon
+from aaf_v2.assets import resolve_aaf_v1_path
 
 
 def test_preview_returns_svg() -> None:
@@ -79,3 +80,11 @@ def test_preview_embeds_damage_element_and_upgrade_assets() -> None:
     assert 'id="element-icon-1-fire"' in result.svg
     assert 'id="element-icon-2-ice"' in result.svg
     assert 'id="upgraded-diamond"' in result.svg
+
+
+def test_legacy_aaf_assets_are_available() -> None:
+    assert resolve_aaf_v1_path("rules", "damage-mana").exists()
+    assert resolve_aaf_v1_path("rules", "multi-damage-mana").exists()
+    assert resolve_aaf_v1_path("rules", "mana").exists()
+    assert resolve_aaf_v1_path("assetDirs", "numberIcons").exists()
+    assert resolve_aaf_v1_path("assetDirs", "topIcons").exists()

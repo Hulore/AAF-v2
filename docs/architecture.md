@@ -32,3 +32,16 @@ AAF v2 does not own:
 4. Missing visual elements.
 5. V2 adapter integration.
 
+## Legacy Assets
+
+AAF v2 intentionally carries the old AAF runtime assets under `data/aaf-v1/`.
+This makes V2 a continuation of the previous tool instead of a detached rewrite:
+
+- old active frame SVG layers
+- old manual frame layout JSON files
+- old number icons
+- old top active icons
+- old main/number fonts
+- old class color list
+
+The new V2-only additions live beside them in `data/Dmg Type/`, `data/Elemental Type/`, and `data/Upgraded_diamond/`.

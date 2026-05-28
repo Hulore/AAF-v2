@@ -33,6 +33,26 @@
     "water": "Elemental Type/Water.svg",
     "wind": "Elemental Type/Wind.svg"
   },
-  "upgradedDiamond": "Upgraded_diamond/2775.svg"
+  "upgradedDiamond": "Upgraded_diamond/2775.svg",
+  "aafV1": {
+    "root": "aaf-v1",
+    "svgImportant": "aaf-v1/SVG Important",
+    "rules": {
+      "damage-mana": "aaf-v1/rules/active_frame_1_manual.json",
+      "multi-damage-mana": "aaf-v1/rules/active_frame_2_manual.json",
+      "mana": "aaf-v1/rules/active_frame_3_manual.json",
+      "topIcons": "aaf-v1/rules/active_type_icons.json",
+      "classColors": "aaf-v1/rules/classes.txt"
+    },
+    "fonts": {
+      "main": "aaf-v1/SVG Important/MainFont/fonts/6_Edmundm_EdmundMcMillen_INTLv4 Regular.ttf",
+      "numbers": "aaf-v1/SVG Important/Number Fonts/fonts/1_TikaFont_TikaFont Adjusted Regular.ttf"
+    },
+    "assetDirs": {
+      "frames": "aaf-v1/SVG Important/shapes",
+      "numberIcons": "aaf-v1/SVG Important/Svg number icons/shapes",
+      "topIcons": "aaf-v1/SVG Important/Svg Up Active Icons/shapes",
+      "legacyElementIcons": "aaf-v1/SVG Important/Svg Elemental Active Icons/shapes"
+    }
+  }
 }
-

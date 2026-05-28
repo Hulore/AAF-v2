@@ -17,6 +17,7 @@ class AssetManifest:
     damage_type_aliases: dict[str, str]
     elements: dict[str, Path]
     upgraded_diamond: Path
+    aaf_v1: dict[str, object]
 
 
 @lru_cache(maxsize=1)
@@ -36,6 +37,7 @@ def load_asset_manifest() -> AssetManifest:
             for key, value in data.get("elements", {}).items()
         },
         upgraded_diamond=DATA_DIR / data["upgradedDiamond"],
+        aaf_v1=data.get("aafV1", {}),
     )
 
 
@@ -67,6 +69,17 @@ def resolve_upgraded_diamond_asset() -> Path:
     return load_asset_manifest().upgraded_diamond
 
 
+def resolve_aaf_v1_path(*keys: str) -> Path:
+    value: object = load_asset_manifest().aaf_v1
+    for key in keys:
+        if not isinstance(value, dict) or key not in value:
+            raise KeyError(".".join(("aafV1", *keys)))
+        value = value[key]
+    if not isinstance(value, str):
+        raise TypeError(f"aafV1.{'.'.join(keys)} does not point to a file path")
+    return DATA_DIR / value
+
+
 def supported_damage_types() -> set[str]:
     manifest = load_asset_manifest()
     return set(manifest.damage_types) | set(manifest.damage_type_aliases) | {"none"}
@@ -74,4 +87,3 @@ def supported_damage_types() -> set[str]:
 
 def supported_elements() -> set[str]:
     return set(load_asset_manifest().elements) | {"none"}
-
