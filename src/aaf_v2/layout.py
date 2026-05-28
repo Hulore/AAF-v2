@@ -9,7 +9,7 @@ from typing import Any
 from .assets import DATA_DIR
 
 
-DEFAULT_ICON_ELEMENT_LAYOUT = DATA_DIR / "layouts" / "icon-elements.json"
+DEFAULT_ICON_ELEMENT_LAYOUT = DATA_DIR / "layouts" / "icon-elements.damage-mana.json"
 ICON_ELEMENT_LAYOUTS = {
     "damage-mana": DATA_DIR / "layouts" / "icon-elements.damage-mana.json",
     "multi-damage-mana": DATA_DIR / "layouts" / "icon-elements.multi-damage-mana.json",
